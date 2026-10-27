@@ -1,0 +1,682 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#060b25">
+<title>PocketTrack — Your Money</title>
+<style>
+:root {
+  --bg:#060b25;--panel:#0d1536;--line:#27305d;
+  --text:#f7f8ff;--muted:#929cbe;--purple:#a044ff;
+  --green:#62f5a1;--pink:#ff4eaa;--blue:#55aaff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:system-ui,-apple-system,sans-serif;
+  font-size:14px;padding-bottom:90px
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:2px solid var(--green);outline-offset:3px
+}
+.app{max-width:760px;margin:auto;padding:20px 17px}
+header{display:flex;align-items:center;justify-content:space-between;margin:8px 0 22px}
+h1{font-size:clamp(25px,6vw,36px);margin:0;letter-spacing:-1.2px}
+h2{font-size:17px;margin:0}
+h3{font-size:14px;margin:0}
+p{margin:0}
+.muted{color:var(--muted)}
+.subtitle{margin-top:5px;color:var(--muted)}
+.bell{
+  width:48px;height:48px;border:1px solid var(--line);border-radius:17px;
+  background:#151b43;color:white;font-size:22px;position:relative
+}
+.bell:after{
+  content:"";position:absolute;width:8px;height:8px;background:var(--purple);
+  border-radius:50%;right:9px;top:8px
+}
+.panel{
+  background:linear-gradient(145deg,#101735,#0b1130);
+  border:1px solid #303c70;border-radius:23px;
+  box-shadow:0 10px 35px #0002;margin-bottom:16px
+}
+.balance{
+  padding:23px 20px;
+  border-color:#a65cff;
+  box-shadow:0 0 22px #8c38ff30,inset 0 0 25px #7a2bff0b
+}
+.eyebrow{color:var(--muted);font-size:14px;font-weight:650}
+.money{
+  font-size:clamp(30px,8vw,49px);font-weight:850;letter-spacing:-1.6px;
+  color:var(--green);overflow-wrap:anywhere;margin:9px 0 8px
+}
+.trend{
+  display:inline-block;color:var(--green);background:#103a34;
+  padding:7px 11px;border-radius:22px;font-weight:750
+}
+.balance-note{color:var(--muted);margin-left:8px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:23px}
+.btn{
+  border:1px solid #343d67;background:#141c3c;color:white;
+  border-radius:15px;padding:14px 9px;font-weight:750
+}
+.btn:hover{filter:brightness(1.2)}
+.btn.primary{
+  background:linear-gradient(110deg,#a23cff,#6826e8);
+  border-color:#b77bff;box-shadow:0 0 20px #8e35ff25
+}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:16px}
+.stat{padding:15px 12px;min-width:0;overflow:hidden}
+.stat:nth-child(1){border-color:#36d7e7;box-shadow:0 0 16px #26d4e51a}
+.stat:nth-child(2){border-color:#b34cff;box-shadow:0 0 16px #b34cff19}
+.stat:nth-child(3){border-color:#6065ff;box-shadow:0 0 16px #6065ff19}
+.stat-icon{
+  width:39px;height:39px;display:grid;place-items:center;border-radius:13px;
+  font-size:20px;background:#172a46;margin-bottom:12px
+}
+.stat:nth-child(1) .stat-icon,.stat:nth-child(1) .stat-value{color:var(--green)}
+.stat:nth-child(2) .stat-icon,.stat:nth-child(2) .stat-value{color:var(--pink)}
+.stat:nth-child(3) .stat-icon,.stat:nth-child(3) .stat-value{color:var(--blue)}
+.stat-label{color:var(--muted);font-size:12px}
+.stat-value{font-weight:850;font-size:clamp(13px,3.5vw,20px);margin:4px 0;overflow-wrap:anywhere}
+.stat-foot{font-size:11px;color:var(--muted)}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
+.chart-panel{padding:20px}
+.chart-layout{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:10px}
+.legend{display:flex;flex-direction:column;gap:13px;min-width:0}
+.legend-item{display:grid;grid-template-columns:10px minmax(0,1fr);gap:8px;align-items:start}
+.dot{width:9px;height:9px;border-radius:50%;margin-top:4px}
+.legend-name{color:#c5cce4;overflow-wrap:anywhere}
+.legend-detail{color:var(--muted);font-size:11px;margin-top:3px}
+.donut-wrap{display:grid;place-items:center;min-width:0}
+.donut{
+  width:min(100%,210px);aspect-ratio:1;border-radius:50%;
+  background:conic-gradient(#8f38ff 0 35%,#f12f91 35% 60%,
+    #3689ff 60% 75%,#29c68d 75% 85%,#ffc24c 85% 93%,#777da5 93% 100%);
+  display:grid;place-items:center;position:relative;
+  box-shadow:0 0 20px #8035ff18
+}
+.donut:before{content:"";position:absolute;inset:23%;border-radius:50%;background:#0d1432}
+.donut-center{position:relative;text-align:center;padding:4px;max-width:90%}
+.donut-total{font-size:clamp(12px,3.4vw,19px);font-weight:850;overflow-wrap:anywhere}
+.donut-sub{color:var(--muted);margin-top:5px}
+.goal{padding:18px;display:flex;gap:12px;align-items:center}
+.goal-icon{
+  width:52px;height:52px;flex-shrink:0;display:grid;place-items:center;
+  background:#4a22a1;border:1px solid #a35cff;border-radius:50%;font-size:24px
+}
+.goal-main{flex:1;min-width:0}
+.goal-number{font-size:26px;font-weight:850;color:var(--green)}
+.progress{height:9px;border-radius:10px;background:#222b4b;overflow:hidden;margin-top:10px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#62f5a1,#25c979);border-radius:10px;transition:width .3s}
+.goal-side{text-align:right}
+.goal-side button{background:none;border:0;color:var(--muted);font-size:11px;text-decoration:underline;margin-top:7px}
+.insights{padding:19px;background:linear-gradient(120deg,#7828df,#4a1ba8);border-color:#a568ff;width:100%;font-weight:800;font-size:15px}
+.view{display:none}
+.view.active{display:block}
+.transaction{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid #ffffff10}
+.transaction:last-child{border-bottom:0}
+.tx-icon{width:42px;height:42px;border-radius:13px;background:#172246;display:grid;place-items:center;font-size:19px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-name{font-weight:750;overflow-wrap:anywhere}
+.tx-meta{font-size:11px;color:var(--muted);margin-top:4px}
+.tx-right{text-align:right;flex-shrink:0}
+.tx-amount{font-weight:800}
+.pos{color:var(--green)}.neg{color:var(--pink)}
+.small-btn{background:#1b2449;border:1px solid var(--line);border-radius:9px;color:#c6cbe0;padding:6px 8px;margin-top:6px;font-size:11px}
+.form-panel{padding:20px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:15px}
+label{color:#c4cce4;font-size:12px;font-weight:700}
+input,select{
+  width:100%;min-width:0;padding:13px;border-radius:12px;
+  border:1px solid #333e6c;background:#0a112c;color:white
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full{width:100%}
+.note{color:var(--muted);font-size:12px;line-height:1.6;margin-top:12px}
+.budget-row{margin:20px 0}
+.budget-label{display:flex;justify-content:space-between;gap:8px;margin-bottom:9px}
+.profile-icon{width:65px;height:65px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:#48218a;margin:0 auto 15px}
+.center{text-align:center}
+.insight-item{padding:14px 0;border-bottom:1px solid #ffffff12;line-height:1.6}
+.insight-item:last-child{border-bottom:0}
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:10;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:2px;
+  background:#080e2bF5;border-top:1px solid #222d54;
+  padding:9px max(7px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom));
+  backdrop-filter:blur(15px)
+}
+.nav-btn{border:0;background:none;color:#8e98ba;font-size:10px;display:flex;align-items:center;flex-direction:column;gap:4px;padding:4px 0}
+.nav-icon{font-size:21px}
+.nav-btn.active{color:#bc69ff}
+.nav-btn.add .nav-icon{
+  width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(140deg,#c65cff,#6a2cf4);color:white;
+  box-shadow:0 0 17px #923cff75;font-size:29px;margin-top:-17px;
+  border:2px solid #d6a7ff
+}
+.nav-btn.add{color:#bda2ff}
+.empty{text-align:center;color:var(--muted);padding:25px 10px}
+select option{background:#0d1536}
+@media(max-width:410px){
+  .app{padding:15px 11px}
+  .stat{padding:12px 9px}
+  .chart-panel{padding:14px}
+  .chart-layout{grid-template-columns:1fr 1fr;gap:5px}
+  .legend{gap:10px}
+  .legend-item{gap:5px}
+  .legend-name{font-size:12px}
+  .goal{padding:13px;gap:8px}
+  .goal-icon{width:40px;height:40px;font-size:19px}
+  .goal-number{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <h1 id="greeting">Your Money 💰</h1>
+    <p class="subtitle">Take control of your finances</p>
+  </div>
+  <button class="bell" id="notifications" aria-label="Notifications">♧</button>
+</header>
+
+<main>
+<section class="view active" id="homeView">
+  <div class="panel balance">
+    <div class="eyebrow">Total Balance</div>
+    <div class="money" id="balance">₦0.00</div>
+    <span class="trend" id="trend">↗ 0%</span>
+    <span class="balance-note">vs last month*</span>
+    <div class="actions">
+      <button class="btn" data-open="income">⊙ Add Money</button>
+      <button class="btn" data-open="expense">↑ Send Money</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="panel stat">
+      <div class="stat-icon">↗</div>
+      <div class="stat-label">Income</div>
+      <div class="stat-value" id="income">₦0</div>
+      <div class="stat-foot">This month</div>
+    </div>
+    <div class="panel stat">
+      <div class="stat-icon">▤</div>
+      <div class="stat-label">Expenses</div>
+      <div class="stat-value" id="expenses">₦0</div>
+      <div class="stat-foot">This month</div>
+    </div>
+    <div class="panel stat">
+      <div class="stat-icon">♧</div>
+      <div class="stat-label">Savings</div>
+      <div class="stat-value" id="savings">₦0</div>
+      <div class="stat-foot">Goal progress</div>
+    </div>
+  </div>
+
+  <div class="panel chart-panel">
+    <div class="section-head">
+      <div><h2>Expenses Breakdown</h2><p class="muted" style="margin-top:5px">This month</p></div>
+      <span class="muted">◉</span>
+    </div>
+    <div class="chart-layout">
+      <div class="legend" id="legend"></div>
+      <div class="donut-wrap">
+        <div class="donut" id="donut">
+          <div class="donut-center">
+            <div class="donut-total" id="donutTotal">₦0.00</div>
+            <div class="donut-sub">Total</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel goal">
+    <div class="goal-icon">◎</div>
+    <div class="goal-main">
+      <h2>Monthly Goal</h2>
+      <p class="muted" id="goalCaption" style="margin-top:4px">Save ₦5,000 this month</p>
+      <div class="progress"><div class="progress-fill" id="goalBar"></div></div>
+    </div>
+    <div class="goal-side">
+      <div class="goal-number" id="goalPercent">0%</div>
+      <div class="muted" id="goalAmount">₦0 / ₦5,000</div>
+      <button data-open="goal">Edit goal</button>
+    </div>
+  </div>
+
+  <button class="btn insights full" data-view="insights">✧ View Financial Insights →</button>
+
+  <div class="section-head" style="margin-top:25px">
+    <h2>Recent Transactions</h2>
+    <button class="small-btn" data-view="transactions">See all →</button>
+  </div>
+  <div class="panel" style="padding:15px" id="recent"></div>
+</section>
+
+<section class="view" id="transactionsView">
+  <h1>Transactions</h1>
+  <p class="subtitle" style="margin-bottom:20px">Every naira, accounted for.</p>
+  <div class="panel" style="padding:15px">
+    <div class="field">
+      <label for="filter">Show transactions</label>
+      <select id="filter">
+        <option value="all">All transactions</option>
+        <option value="income">Income only</option>
+        <option value="expense">Expenses only</option>
+      </select>
+    </div>
+    <div id="allTransactions"></div>
+    <button class="btn full" id="export">↓ Export transactions (CSV)</button>
+    <p class="note">CSV files can be opened with spreadsheet apps.</p>
+  </div>
+</section>
+
+<section class="view" id="addView">
+  <h1 id="formTitle">Add Money</h1>
+  <p class="subtitle" style="margin-bottom:20px">Record your money movement.</p>
+  <form class="panel form-panel" id="transactionForm">
+    <div class="field">
+      <label for="description">Description</label>
+      <input id="description" maxlength="80" placeholder="e.g. Freelance payment" required>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="amount">Amount (₦)</label>
+        <input id="amount" type="number" min="0.01" max="999999999999" step="0.01" inputmode="decimal" placeholder="5000" required>
+      </div>
+      <div class="field">
+        <label for="type">Type</label>
+        <select id="type">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category">
+        <option>Housing</option><option>Food</option><option>Transport</option>
+        <option>Shopping</option><option>Entertainment</option><option>Work</option>
+        <option>Business</option><option>Bills</option><option>Data & Internet</option>
+        <option>Education</option><option>Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="date">Date</label>
+      <input type="date" id="date" required>
+    </div>
+    <button class="btn primary full" type="submit">Save Transaction ✓</button>
+    <p class="note" id="formMessage" role="status"></p>
+  </form>
+</section>
+
+<section class="view" id="budgetView">
+  <h1>Your Budget</h1>
+  <p class="subtitle" style="margin-bottom:20px">Keep spending in check.</p>
+  <div class="panel form-panel">
+    <h2>Monthly spending limit</h2>
+    <p class="muted" style="margin:6px 0 18px">Set the maximum you want to spend this month.</p>
+    <form id="budgetForm">
+      <div class="field">
+        <label for="budgetInput">Budget amount (₦)</label>
+        <input type="number" id="budgetInput" min="0" max="999999999999" step="0.01" required>
+      </div>
+      <button class="btn primary full">Save budget</button>
+    </form>
+    <div class="budget-row">
+      <div class="budget-label"><span class="muted">Spent this month</span><strong id="budgetSpent">₦0</strong></div>
+      <div class="progress"><div class="progress-fill" id="budgetBar"></div></div>
+      <p class="note" id="budgetRemaining"></p>
+    </div>
+  </div>
+  <div class="panel form-panel">
+    <h2>Monthly savings goal</h2>
+    <p class="muted" style="margin:6px 0 18px">Track the amount you want to save.</p>
+    <form id="goalForm">
+      <div class="field">
+        <label for="goalInput">Goal amount (₦)</label>
+        <input type="number" id="goalInput" min="1" max="999999999999" step="0.01" required>
+      </div>
+      <button class="btn primary full">Save goal</button>
+    </form>
+    <p class="note">Your savings progress is estimated as income minus expenses for the current month. This is not a bank balance.</p>
+  </div>
+</section>
+
+<section class="view" id="insightsView">
+  <h1>Financial Insights ✨</h1>
+  <p class="subtitle" style="margin-bottom:20px">A clearer picture of your money.</p>
+  <div class="panel form-panel" id="insightList"></div>
+</section>
+
+<section class="view" id="profileView">
+  <h1>Your Profile</h1>
+  <p class="subtitle" style="margin-bottom:20px">Make PocketTrack yours.</p>
+  <div class="panel form-panel">
+    <div class="profile-icon">♙</div>
+    <div class="field">
+      <label for="userName">Your display name</label>
+      <input id="userName" maxlength="40" placeholder="Your name">
+    </div>
+    <button class="btn primary full" id="saveName">Save profile</button>
+    <p class="note">Your profile is stored locally in this browser.</p>
+  </div>
+  <div class="panel form-panel">
+    <h2>Data & privacy</h2>
+    <p class="note">Your transaction records are stored in this browser, not on a server. They do not sync between devices. Export a backup before clearing site data.</p>
+    <button class="btn full" id="backup">Export backup (JSON)</button>
+    <button class="btn full" id="importBtn" style="margin-top:10px">Import backup (JSON)</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+    <button class="btn full" id="reset" style="margin-top:10px;background:#521b3a;border-color:#a93468">Delete all local data</button>
+    <p class="note" id="profileMessage" role="status"></p>
+  </div>
+</section>
+</main>
+</div>
+
+<nav class="bottom-nav" aria-label="Main navigation">
+  <button class="nav-btn active" data-view="home"><span class="nav-icon">⌂</span>Home</button>
+  <button class="nav-btn" data-view="transactions"><span class="nav-icon">☷</span>Transactions</button>
+  <button class="nav-btn add" data-open="income"><span class="nav-icon">＋</span>Add</button>
+  <button class="nav-btn" data-view="budget"><span class="nav-icon">◔</span>Budget</button>
+  <button class="nav-btn" data-view="profile"><span class="nav-icon">♙</span>Profile</button>
+</nav>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const KEY = "pockettrack_neon_v2";
+const COLORS = ["#943dff","#f13e98","#3d91ff","#29cb8b","#ffc34c","#858bb3"];
+const CATEGORIES = ["Housing","Food","Transport","Shopping","Entertainment","Other"];
+let state = {
+  transactions:[],goal:5000,budget:0,name:"",readNotifications:true
+};
+
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+};
+const monthKey = date => String(date).slice(0,7);
+const currentMonth = () => today().slice(0,7);
+const fmt = n => new Intl.NumberFormat("en-NG",{
+  style:"currency",currency:"NGN",minimumFractionDigits:2,maximumFractionDigits:2
+}).format(n);
+const shortMoney = n => {
+  if(n >= 1000000000) return "₦"+(n/1000000000).toFixed(1)+"B";
+  if(n >= 1000000) return "₦"+(n/1000000).toFixed(1)+"M";
+  if(n >= 100000) return "₦"+(n/1000).toFixed(0)+"k";
+  return fmt(n);
+};
+const esc = s => String(s).replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+})[c]);
+
+function validTransactions(items) {
+  return Array.isArray(items) && items.length <= 10000 && items.every(t =>
+    t && typeof t.id==="string" && typeof t.description==="string" &&
+    t.description.length<=80 && typeof t.amount==="number" &&
+    Number.isFinite(t.amount) && t.amount>0 && t.amount<=999999999999 &&
+    ["income","expense"].includes(t.type) &&
+    typeof t.category==="string" && t.category.length<=50 &&
+    typeof t.date==="string" && /^\d{4}-\d{2}-\d{2}$/.test(t.date)
+  );
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return;
+    const s=JSON.parse(raw);
+    if(!s || !validTransactions(s.transactions)) throw Error("Invalid saved data");
+    state.transactions=s.transactions;
+    if(Number.isFinite(s.goal)&&s.goal>0&&s.goal<=999999999999) state.goal=s.goal;
+    if(Number.isFinite(s.budget)&&s.budget>=0&&s.budget<=999999999999) state.budget=s.budget;
+    if(typeof s.name==="string") state.name=s.name.slice(0,40);
+  } catch {
+    alert("PocketTrack couldn't read its saved data. Your existing browser storage was not overwritten. Try exporting or recovering your records before making changes.");
+    state.storageError=true;
+  }
+}
+function save() {
+  if(state.storageError) {
+    alert("Saving is paused because existing saved data could not be read. Export or recover your records before continuing.");
+    return false;
+  }
+  try {
+    localStorage.setItem(KEY,JSON.stringify({
+      transactions:state.transactions,goal:state.goal,budget:state.budget,name:state.name
+    }));
+    return true;
+  } catch {
+    alert("Your browser couldn't save the data. Check available storage and browser settings.");
+    return false;
+  }
+}
+function totals(items) {
+  let income=0,expense=0;
+  items.forEach(t=>t.type==="income"?income+=t.amount:expense+=t.amount);
+  return {income,expense,balance:income-expense};
+}
+function monthTransactions() {
+  return state.transactions.filter(t=>monthKey(t.date)===currentMonth());
+}
+function displayName() {
+  $("greeting").textContent=state.name ? `Your Money, ${state.name} 💰` : "Your Money 💰";
+}
+function renderSummary() {
+  const t=totals(monthTransactions());
+  const all=totals(state.transactions);
+  $("balance").textContent=fmt(all.balance);
+  $("income").textContent=shortMoney(t.income);
+  $("expenses").textContent=shortMoney(t.expense);
+  $("savings").textContent=shortMoney(Math.max(0,t.balance));
+  const pct=state.goal>0?Math.min(100,Math.round(Math.max(0,t.balance)/state.goal*100)):0;
+  $("goalPercent").textContent=pct+"%";
+  $("goalAmount").textContent=`${shortMoney(Math.max(0,t.balance))} / ${shortMoney(state.goal)}`;
+  $("goalCaption").textContent=`Save ${fmt(state.goal)} this month`;
+  $("goalBar").style.width=pct+"%";
+  $("trend").textContent=t.balance>=0?"↗ Positive monthly cash flow":"↘ Negative monthly cash flow";
+  $("trend").style.fontSize="12px";
+  $("budgetInput").value=state.budget||"";
+  $("goalInput").value=state.goal;
+}
+function renderChart() {
+  const expenses=monthTransactions().filter(t=>t.type==="expense");
+  const groups={};
+  expenses.forEach(t=>groups[t.category]=(groups[t.category]||0)+t.amount);
+  const entries=Object.entries(groups).sort((a,b)=>b[1]-a[1]);
+  const total=expenses.reduce((s,t)=>s+t.amount,0);
+  $("donutTotal").textContent=shortMoney(total);
+  if(!total) {
+    $("donut").style.background="#273052";
+    $("legend").innerHTML='<div class="muted">No expenses recorded this month yet.</div>';
+    return;
+  }
+  let cursor=0;
+  const stops=entries.map(([name,value],i)=>{
+    const start=cursor;cursor+=value/total*100;
+    return `${COLORS[i%COLORS.length]} ${start}% ${cursor}%`;
+  });
+  $("donut").style.background=`conic-gradient(${stops.join(",")})`;
+  $("legend").innerHTML=entries.map(([name,value],i)=>`
+    <div class="legend-item">
+      <span class="dot" style="background:${COLORS[i%COLORS.length]}"></span>
+      <div><div class="legend-name">${esc(name)}</div>
+      <div class="legend-detail">${(value/total*100).toFixed(0)}% · ${esc(shortMoney(value))}</div></div>
+    </div>`).join("");
+}
+function transactionHTML(t) {
+  const income=t.type==="income";
+  return `<article class="transaction">
+    <div class="tx-icon">${income?"↙":"↗"}</div>
+    <div class="tx-info"><div class="tx-name">${esc(t.description)}</div>
+      <div class="tx-meta">${esc(t.category)} · ${esc(t.date)}</div></div>
+    <div class="tx-right"><div class="tx-amount ${income?"pos":"neg"}">${income?"+":"−"}${esc(fmt(t.amount))}</div>
+      <button class="small-btn" data-delete="${esc(t.id)}">Delete</button></div>
+  </article>`;
+}
+function renderTransactions() {
+  const items=[...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+  $("recent").innerHTML=items.length?items.slice(0,4).map(transactionHTML).join():'<div class="empty">No transactions yet.<br>Add your first one below.</div>';
+  const filter=$("filter").value;
+  const filtered=items.filter(t=>filter==="all"||t.type===filter);
+  $("allTransactions").innerHTML=filtered.length?filtered.map(transactionHTML).join():'<div class="empty">Nothing here yet.</div>';
+}
+function renderBudget() {
+  const spent=totals(monthTransactions()).expense;
+  const pct=state.budget>0?Math.min(100,spent/state.budget*100):0;
+  $("budgetSpent").textContent=fmt(spent);
+  $("budgetBar").style.width=pct+"%";
+  $("budgetBar").style.background=pct>=100?"#ff4eaa":"linear-gradient(90deg,#62f5a1,#25c979)";
+  $("budgetRemaining").textContent=state.budget>0?
+    (spent>state.budget?`You've exceeded your budget by ${fmt(spent-state.budget)}.`:`${fmt(state.budget-spent)} remaining this month.`):
+    "Set a monthly spending limit to start tracking your budget.";
+}
+function renderInsights() {
+  const t=totals(monthTransactions());
+  const expenses=monthTransactions().filter(x=>x.type==="expense");
+  const income=monthTransactions().filter(x=>x.type==="income");
+  const groups={};
+  expenses.forEach(x=>groups[x.category]=(groups[x.category]||0)+x.amount);
+  const largest=Object.entries(groups).sort((a,b)=>b[1]-a[1])[0];
+  const savingsRate=t.income>0?Math.round((t.income-t.expense)/t.income*100):0;
+  const items=[
+    ["💰","Monthly cash flow",t.balance>=0?`You have ${fmt(t.balance)} left after recorded income and expenses this month.`:`Your recorded expenses exceed income by ${fmt(-t.balance)} this month.`],
+    ["📊","Savings rate",t.income>0?`Your estimated savings rate is ${savingsRate}%. This is based only on the transactions you entered.`:"Add income to calculate your estimated savings rate."],
+    ["🔎","Largest expense category",largest?`${largest[0]} accounts for ${fmt(largest[1])} of your expenses this month.`:"Add expenses to see which category costs you the most."],
+    ["🎯","Savings goal",`${Math.min(100,Math.round(Math.max(0,t.balance)/state.goal*100))}% of your monthly target is covered by your recorded net cash flow.`],
+    ["🧾","Transactions",`You've recorded ${monthTransactions().length} transaction(s) this month.`]
+  ];
+  $("insightList").innerHTML=items.map(x=>`<div class="insight-item"><strong>${x[0]} ${esc(x[1])}</strong><p class="muted" style="margin-top:6px">${esc(x[2])}</p></div>`).join("")+
+    '<p class="note">These insights are estimates from the records you enter, not financial advice or bank-verified balances.</p>';
+}
+function render() {
+  displayName();renderSummary();renderChart();renderTransactions();renderBudget();renderInsights();
+}
+function showView(name) {
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===name+"View"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function openForm(type) {
+  $("type").value=type;
+  $("formTitle").textContent=type==="income"?"Add Money":"Record Expense";
+  $("formMessage").textContent="";
+  $("date").value=today();
+  showView("add");
+  $("description").focus({preventScroll:true});
+}
+function downloadFile(filename,content,type) {
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function exportCSV() {
+  const quote=s=>`"${String(s).replace(/"/g,'""')}"`;
+  const rows=[["Description","Type","Category","Amount_NGN","Date"],
+    ...state.transactions.map(t=>[t.description,t.type,t.category,t.amount.toFixed(2),t.date])];
+  downloadFile("pockettrack-transactions.csv","\uFEFF"+rows.map(r=>r.map(quote).join(",")).join("\r\n"),"text/csv;charset=utf-8");
+}
+
+document.addEventListener("click",e=>{
+  const open=e.target.closest("[data-open]");
+  if(open){openForm(open.dataset.open);return;}
+  const view=e.target.closest("[data-view]");
+  if(view){showView(view.dataset.view);return;}
+  const del=e.target.closest("[data-delete]");
+  if(del){
+    const t=state.transactions.find(x=>x.id===del.dataset.delete);
+    if(!t||!confirm(`Delete "${t.description}"?`))return;
+    const old=state.transactions;
+    state.transactions=old.filter(x=>x.id!==t.id);
+    if(save())render();else state.transactions=old;
+  }
+});
+$("transactionForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const description=$("description").value.trim();
+  const amount=Number($("amount").value),type=$("type").value,date=$("date").value;
+  if(!description||!Number.isFinite(amount)||amount<=0||amount>999999999999||
+    !date||!["income","expense"].includes(type)){
+    $("formMessage").textContent="Please enter valid transaction details.";return;
+  }
+  const entry={id:Date.now()+"-"+Math.random().toString(36).slice(2,9),
+    description,amount,type,date,category:$("category").value};
+  state.transactions.push(entry);
+  if(!save()){state.transactions.pop();return;}
+  $("transactionForm").reset();$("date").value=today();
+  $("formMessage").textContent="Transaction saved successfully ✓";
+  render();showView("home");
+});
+$("filter").addEventListener("change",renderTransactions);
+$("export").addEventListener("click",exportCSV);
+$("budgetForm").addEventListener("submit",e=>{
+  e.preventDefault();const n=Number($("budgetInput").value);
+  if(!Number.isFinite(n)||n<0||n>999999999999){alert("Enter a valid budget.");return;}
+  const old=state.budget;state.budget=n;
+  if(save()){render();alert("Monthly budget saved ✓");}else state.budget=old;
+});
+$("goalForm").addEventListener("submit",e=>{
+  e.preventDefault();const n=Number($("goalInput").value);
+  if(!Number.isFinite(n)||n<=0||n>999999999999){alert("Enter a valid savings goal.");return;}
+  const old=state.goal;state.goal=n;
+  if(save()){render();alert("Savings goal saved ✓");}else state.goal=old;
+});
+$("saveName").addEventListener("click",()=>{
+  const old=state.name;state.name=$("userName").value.trim().slice(0,40);
+  if(save()){displayName();$("profileMessage").textContent="Profile saved ✓";}
+  else state.name=old;
+});
+$("notifications").addEventListener("click",()=>{
+  const t=totals(monthTransactions());
+  alert(`PocketTrack summary\n\nIncome: ${fmt(t.income)}\nExpenses: ${fmt(t.expense)}\nNet cash flow: ${fmt(t.balance)}\n\nThis summary uses your locally recorded transactions.`);
+});
+$("backup").addEventListener("click",()=>{
+  downloadFile("pockettrack-backup.json",JSON.stringify({
+    version:2,transactions:state.transactions,goal:state.goal,budget:state.budget,name:state.name
+  },null,2),"application/json");
+});
+$("importBtn").addEventListener("click",()=>$("importFile").click());
+$("importFile").addEventListener("change",async e=>{
+  const file=e.target.files[0];if(!file)return;
+  try {
+    if(file.size>5000000)throw Error("File is too large.");
+    const data=JSON.parse(await file.text());
+    if(!data||!validTransactions(data.transactions))throw Error("The backup format is invalid.");
+    if(!confirm("Import this backup? This replaces the current local transactions and settings."))return;
+    const old=state;
+    state={transactions:data.transactions,goal:Number.isFinite(data.goal)&&data.goal>0?data.goal:5000,
+      budget:Number.isFinite(data.budget)&&data.budget>=0?data.budget:0,
+      name:typeof data.name==="string"?data.name.slice(0,40):"",storageError:false};
+    if(save()){render();$("profileMessage").textContent="Backup imported ✓";}
+    else state=old;
+  } catch(err){alert("Could not import backup: "+err.message);}
+  finally{e.target.value="";}
+});
+$("reset").addEventListener("click",()=>{
+  if(!confirm("Permanently delete all PocketTrack data stored in this browser? Export a backup first if needed."))return;
+  const old=state;
+  state={transactions:[],goal:5000,budget:0,name:"",storageError:false};
+  if(save()){render();$("userName").value="";$("profileMessage").textContent="Local data cleared.";}
+  else state=old;
+});
+
+load();
+$("date").value=today();
+$("userName").value=state.name;
+render();
+})();
+</script>
+</body>
+</html>
